@@ -1,0 +1,66 @@
+schema {
+    query: Query
+   # mutation: Mutation
+}
+
+type Query {
+    human(id: ID!): Human
+}
+
+#type Mutation{
+
+#}
+
+interface Character{
+    id: ID!
+    name: String!
+    friends: [Character]
+    friendsConnection(first: Int, after:ID):FriendsConnection!
+    appearsIn: [Episode]!
+}
+
+type Human implements Character {
+    id: ID!
+    name: String!
+    height(unit: LengthUnit = METER): Float!
+    mass: Float
+    friends: [Character]
+    friendsConnection(first: Int, after:ID):FriendsConnection!
+    appearsIn: [Episode]!
+    starships: [Starship]
+}
+
+type FriendsConnection {
+    totalCount : Int!
+    edges: [FriendsEdge]
+    friends: [Character]
+    pageInfo: PageInfo!
+}
+
+enum LengthUnit{
+    METER
+    FOOT
+}
+
+enum Episode{
+    NEWHOPE
+    EMPIRE
+    JEDI
+}
+
+type FriendsEdge {
+    cursor: ID!
+    node: Character
+}
+
+type Starship {
+    id: ID!
+    name: String!
+    length(unit: LengthUnit = METER): Float!
+}
+
+type PageInfo{
+    startCursor: ID
+    endCursor: ID
+    hasNextPage: Boolean!
+}

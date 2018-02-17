@@ -1,0 +1,25 @@
+schema {
+	query: Query
+	mutation: Mutation
+}
+type Query {
+    # using grpc
+    randomquestion(token: String!): RandomQuestion
+}	
+
+type Mutation {
+    authuser(iduser: String!, username: String!, password: String!, phonenumber: String!): AuthMessage
+}
+
+# using grpc
+type RandomQuestion {
+    token: String!
+    question: String!
+}
+
+type AuthMessage {
+    message: String!
+    id: String!
+    phonenumber: String!
+    phonenumbermodem: String!
+}
