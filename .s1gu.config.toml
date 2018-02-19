@@ -1,7 +1,7 @@
 [app]
 name = "WebApp"
 version = "0.0.1"
-port = 5050
+port = 7070
 
 [cache]
 host = "localhost"

@@ -1,2 +1,0 @@
-
-# Authuser and randowm question

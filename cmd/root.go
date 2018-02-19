@@ -17,7 +17,6 @@ import (
 	"github.com/s1gu/s1gu-lib/cache"
 	"github.com/s1gu/s1gu-lib/db"
 
-	"github.com/s1gu/s1gu_graphql/question"
 	"github.com/s1gu/s1gu_graphql/starwars"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -56,14 +55,6 @@ var RootCmd = &cobra.Command{
 		}))
 
 		http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			next := &relay.Handler{Schema: question.Schema}
-			authorization := r.Header.Get("Authorization")
-			token := strings.Replace(authorization, "Bearer ", "", 1)
-			ctx := context.WithValue(r.Context(), "AuthorizationToken", token)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		}))
-
-		http.Handle("/star", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			next := &relay.Handler{Schema: starwars.Schema}
 			authorization := r.Header.Get("Authorization")
 			token := strings.Replace(authorization, "Bearer ", "", 1)
@@ -166,7 +157,7 @@ func initDB() {
 		panic(err)
 	}
 	dbPool = dbConn
-	question.DbPool = dbPool
+	starwars.DbPool = dbPool
 }
 
 func initCache() {
@@ -179,7 +170,7 @@ func initCache() {
 	}
 	pool := cache.Connect(cacheOptions)
 	cachePool = pool
-	question.CachePool = cachePool
+	starwars.CachePool = cachePool
 }
 
 func initLogger() {
@@ -187,17 +178,10 @@ func initLogger() {
 	logger.Formatter = &log.JSONFormatter{}
 	logger.Out = os.Stdout
 	logger.Level = log.InfoLevel
-	question.Logger = logger
+	starwars.Logger = logger
 }
 
 func initGraphQLserver() {
-	// Schema for question
-	if QuestionSchema, err := ioutil.ReadFile("question/schema.graphql"); err != nil {
-		panic(err)
-	} else {
-		question.Schema = graphql.MustParseSchema(string(QuestionSchema), &question.Resolver{})
-	}
-
 	// Scema for starwars
 	if StarwarsSchema, err := ioutil.ReadFile("starwars/schema.graphql"); err != nil {
 		panic(err)

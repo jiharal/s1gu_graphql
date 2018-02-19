@@ -13,8 +13,6 @@ type (
 		ID() graphql.ID
 		Name() string
 		Friends() *[]*characterResolver
-		FriendsConnection(friendsConnectionArgs) (*friendsConnectionResolver, error)
-		AppearsIn() []string
 	}
 )
 
@@ -23,24 +21,9 @@ type Resolver struct{}
 // Root Type
 type (
 	Human struct {
-		ID        graphql.ID
-		Name      string
-		Friends   []graphql.ID
-		AppearsIn []string
-		Height    float64
-		Mass      int
-		Starships []graphql.ID
-	}
-	friendsConnectionArgs struct {
-		First *int32
-		After *graphql.ID
-	}
-	droid struct {
-		ID              graphql.ID
-		Name            string
-		Friends         []graphql.ID
-		AppearsIn       []string
-		PrimaryFunction string
+		ID      graphql.ID
+		Name    string
+		Friends []graphql.ID
 	}
 )
 
@@ -52,66 +35,33 @@ type (
 	characterResolver struct {
 		character
 	}
-	friendsConnectionResolver struct {
-		ids  []graphql.ID
-		from int
-		to   int
-	}
-	droidResolver struct {
-		d *droid
-	}
 )
 
 var (
 	humanData = make(map[graphql.ID]*Human)
-	droidData = make(map[graphql.ID]*droid)
 )
 
 var humans = []*Human{
 	{
-		ID:        "1000",
-		Name:      "Luke Skywalker",
-		Friends:   []graphql.ID{"1002", "1003", "2000", "2001"},
-		AppearsIn: []string{"NEWHOPE", "EMPIRE", "JEDI"},
-		Height:    1.72,
-		Mass:      77,
-		Starships: []graphql.ID{"3001", "3003"},
+		ID:      "1000",
+		Name:    "Luke Skywalker",
+		Friends: []graphql.ID{"1002", "1003", "2000", "2001"},
 	},
 	{
-		ID:        "1004",
-		Name:      "Wilhuff Tarkin",
-		Friends:   []graphql.ID{"1001"},
-		AppearsIn: []string{"NEWHOPE"},
-		Height:    1.8,
-		Mass:      0,
+		ID:      "1001",
+		Name:    "Muhammad Faris",
+		Friends: []graphql.ID{"1001"},
 	},
-}
-
-// root human
-func (r *Resolver) Human(args struct{ ID graphql.ID }) *humanResolver {
-	startTime := time.Now()
-	for _, h := range humans {
-		humanData[h.ID] = h
-	}
-	if h := humanData[args.ID]; h != nil {
-		endTime := time.Now()
-		log.Println("Duration:", endTime.Sub(startTime).Seconds())
-		return &humanResolver{h}
-	}
-	return nil
-}
-
-// foot human
-func (s *humanResolver) ID() graphql.ID {
-	return s.a.ID
-}
-
-func (s *humanResolver) Name() string {
-	return s.a.Name
-}
-
-func (s *humanResolver) Friends() *[]*characterResolver {
-	return resolveCharacters(s.a.Friends)
+	{
+		ID:      "1002",
+		Name:    "Jihar Al Gifari",
+		Friends: []graphql.ID{"1001"},
+	},
+	{
+		ID:      "1003",
+		Name:    "Fendi Jatmiko",
+		Friends: []graphql.ID{"1002"},
+	},
 }
 
 func resolveCharacters(ids []graphql.ID) *[]*characterResolver {
@@ -125,11 +75,40 @@ func resolveCharacters(ids []graphql.ID) *[]*characterResolver {
 }
 
 func resolveCharacter(id graphql.ID) *characterResolver {
-	if _, ok := humanData[id]; ok {
-		return &characterResolver{}
-	}
-	if _, ok := droidData[id]; ok {
-		return &characterResolver{}
+	if h, ok := humanData[id]; ok {
+		return &characterResolver{&humanResolver{h}}
 	}
 	return nil
+}
+
+// root
+func (r *Resolver) Human(args struct{ ID graphql.ID }) *humanResolver {
+	startTime := time.Now()
+	for _, h := range humans {
+		humanData[h.ID] = h
+	}
+	if h := humanData[args.ID]; h != nil {
+		endTime := time.Now()
+		log.Println("Duration:", endTime.Sub(startTime).Seconds())
+		return &humanResolver{h}
+	}
+	return nil
+}
+
+// human resolver
+func (s *humanResolver) ID() graphql.ID {
+	return s.a.ID
+}
+
+func (s *humanResolver) Name() string {
+	return s.a.Name
+}
+
+func (s *humanResolver) Friends() *[]*characterResolver {
+	return resolveCharacters(s.a.Friends)
+}
+
+func (r *characterResolver) ToHuman() (*humanResolver, bool) {
+	c, ok := r.character.(*humanResolver)
+	return c, ok
 }
