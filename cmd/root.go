@@ -16,7 +16,7 @@ import (
 	"github.com/neelance/graphql-go/relay"
 	"github.com/s1gu/s1gu-lib/cache"
 	"github.com/s1gu/s1gu-lib/db"
-	"github.com/s1gu/s1gu_graphql/authmc"
+
 	"github.com/s1gu/s1gu_graphql/question"
 	"github.com/s1gu/s1gu_graphql/starwars"
 	log "github.com/sirupsen/logrus"
@@ -121,7 +121,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initLogger, initModem2, initGraphQLserver)
+	cobra.OnInitialize(initConfig, initLogger, initGraphQLserver)
 	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.s1gu.config.toml)")
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
@@ -166,7 +166,6 @@ func initDB() {
 		panic(err)
 	}
 	dbPool = dbConn
-	authmc.DbPool = dbPool
 	question.DbPool = dbPool
 }
 
@@ -181,7 +180,6 @@ func initCache() {
 	pool := cache.Connect(cacheOptions)
 	cachePool = pool
 	question.CachePool = cachePool
-	authmc.CachePool = cachePool
 }
 
 func initLogger() {
@@ -189,18 +187,7 @@ func initLogger() {
 	logger.Formatter = &log.JSONFormatter{}
 	logger.Out = os.Stdout
 	logger.Level = log.InfoLevel
-	authmc.Logger = logger
 	question.Logger = logger
-}
-
-// Modem versi 2
-func initModem2() {
-	gsm := authmc.New()
-	err := gsm.Connect(viper.GetString("serial.port"), viper.GetInt("serial.baud"))
-	if err != nil {
-		fmt.Printf("Error connect to modem : %v", err)
-	}
-	authmc.Gsm = gsm
 }
 
 func initGraphQLserver() {
