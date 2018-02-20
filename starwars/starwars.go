@@ -56,7 +56,7 @@ var (
 var humans = []*Human{
 	{
 		ID:      "1000",
-		Name:    "Luke Skywalker",
+		Name:    "Eko Santoso",
 		Friends: []graphql.ID{"1002", "1003", "2000", "2001"},
 		Height:  7.34,
 		Post:    []graphql.ID{"1", "3"},
@@ -77,6 +77,12 @@ var humans = []*Human{
 	{
 		ID:      "1003",
 		Name:    "Fendi Jatmiko",
+		Friends: []graphql.ID{"1002"},
+		Height:  1.60,
+	},
+	{
+		ID:      "1004",
+		Name:    "Renosyah",
 		Friends: []graphql.ID{"1002"},
 		Height:  1.60,
 	},
