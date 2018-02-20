@@ -1,7 +1,7 @@
 [app]
-name = "WebApp"
+name = "GraphQL BackENd"
 version = "0.0.1"
-port = 7070
+port = 5050
 
 [cache]
 host = "localhost"

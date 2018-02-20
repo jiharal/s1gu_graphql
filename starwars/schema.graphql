@@ -15,10 +15,28 @@ interface Character{
     id: ID!
     name: String!
     friends: [Character]
+    height(unit: LengthUnit=METER):Float!
+    
 }
 
 type Human implements Character {
     id: ID!
     name: String!
     friends: [Character]
+    height(unit: LengthUnit=METER):Float!
+    post:[Post]
+}
+
+# interface post type
+type Post{
+    id: ID!
+    date: String!
+    text: String!
+}
+
+
+# Human(height) LengthUnit Type
+enum LengthUnit {
+    METER
+    FOOT
 }
